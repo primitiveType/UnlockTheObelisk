@@ -10,7 +10,7 @@ This data exists at `"C:\\Users\\USER_NAME\\AppData\\LocalLow\\Dreamsite Games\\
 Then, copy that path (the full path to the .ato file) as you will need to provide that to the tool.
 
 After building (you should be able to use visual studio community or rider to build, or even just run `dotnet build` in the root directory), you can run
-`./atounlocker.exe -help` to see usage.
+`./atounlocker.exe help` to see usage.
 
 run `./atounlocker.exe "PATH_TO_ATO_FILE" [args]`
 
