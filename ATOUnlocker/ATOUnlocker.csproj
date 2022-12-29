@@ -7,10 +7,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\TestProject1\lib\Assembly-CSharp.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
 </Project>
