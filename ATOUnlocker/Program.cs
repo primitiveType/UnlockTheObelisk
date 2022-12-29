@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
@@ -7,16 +8,17 @@ using System.Text;
 
 namespace ATOUnlocker;
 
+using Console = System.Console;
+
 public static class Program
 {
-    private static string Path { get; set; }
+    private static string AtoPath { get; set; }
 
     public static void Main(string[] args)
     {
         Console.Title = "Unlock The Obelisk";
         Console.ForegroundColor = ConsoleColor.DarkYellow;
 
-      
 
         if (args.Length == 0)
         {
@@ -24,9 +26,10 @@ public static class Program
             Console.WriteLine("Use 'ATOUnlocker.exe help' if you want to see arguments.");
             return;
         }
-        
+
         if (args[0] == "help")
         {
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(
                 "First argument must be a path to the player.ato in C:\\Users\\USER_NAME\\AppData\\LocalLow\\Dreamsite Games\\AcrossTheObelisk\\STEAM_ID\\player.ato");
             Console.WriteLine("You must provide further arguments if you want this thing to do anything. Possible Arguments: ");
@@ -38,14 +41,25 @@ public static class Program
         }
 
 
-        Path = args[0];
+        AtoPath = args[0];
+        try
+        {
+            Assembly.Load("Assembly-CSharp");
+        }
+        catch (Exception e)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(
+                "Failed to load game assemblies. Make sure you update the csproj before building and change the gamePath to point at the `Managed` directory of your ATO installation.");
+            return;
+        }
 
         if (args.Length == 1)
         {
             Console.WriteLine("No unlock arguments provided. Doing nothing.");
         }
 
-        if (!File.Exists(Path))
+        if (!File.Exists(AtoPath))
         {
             Console.WriteLine("Couldn't find the file at path. Make sure the path exists. You should be pointing at the player.ato");
         }
@@ -121,7 +135,7 @@ public static class Program
     private static void SavePlayerData(PlayerData playerData)
     {
         DESCryptoServiceProvider cryptoServiceProvider = new();
-        using (FileStream fileStream = new(Path, FileMode.Create, FileAccess.Write))
+        using (FileStream fileStream = new(AtoPath, FileMode.Create, FileAccess.Write))
         {
             using (CryptoStream cryptoStream =
                    new(fileStream, cryptoServiceProvider.CreateEncryptor(Cryptography.Key, Cryptography.IV), CryptoStreamMode.Write))
@@ -136,9 +150,9 @@ public static class Program
 
     private static PlayerData LoadPlayerData()
     {
-        if (File.Exists(Path))
+        if (File.Exists(AtoPath))
         {
-            using (FileStream fileStream = new(Path, FileMode.Open))
+            using (FileStream fileStream = new(AtoPath, FileMode.Open))
             {
                 if (fileStream.Length == 0L)
                 {
@@ -160,7 +174,7 @@ public static class Program
                         catch (Exception ex)
                         {
                             fileStream.Close();
-                            File.Delete(Path);
+                            Console.WriteLine(ex.Message);
                             return null;
                         }
                     }
